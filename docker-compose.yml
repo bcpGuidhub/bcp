@@ -1,0 +1,194 @@
+version: "3.8"
+
+# networks:
+#   bcp:
+#     driver: bridge
+
+services:
+  zookeeper:
+    image: ${REPOSITORY}/cp-zookeeper:${CONFLUENT_DOCKER_TAG}
+    restart: always
+    hostname: zookeeper
+    container_name: zookeeper
+    healthcheck:
+      test: echo srvr | nc zookeeper 2181 || exit 1
+      retries: 20
+      interval: 10s
+    ports:
+      - 2181:2181
+    expose:
+      - "2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  
+  kafka0:
+    hostname: kafka0
+    container_name: kafka0
+    image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}   
+    depends_on:
+      - zookeeper
+    ports:
+      - '8097:8097'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://host.docker.internal:8097,INTERNAL://kafka0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka1:
+    hostname: kafka1
+    container_name: kafka1
+    image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}
+    depends_on:
+      - zookeeper
+    ports:
+      - '9093:9093'
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://host.docker.internal:9093,INTERNAL://kafka1:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka2:
+    hostname: kafka2
+    container_name: kafka2
+    image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}
+    depends_on:
+      - zookeeper
+    ports:
+      - '9094:9094'
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://host.docker.internal:9094,INTERNAL://kafka2:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  cotisation-app:
+     build:
+       dockerfile: Dockerfile.dev
+       context: ./employee_cotisation
+     container_name: cotisation-app
+     ports:
+       - "9000:9000" 
+    #  networks:
+    #    - bcp
+
+  backend-app:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend-app
+    container_name: backend-app
+    environment:
+      - APPENV=dev
+      - DISABLE_PROFILER=true
+      - DISABLE_TRACING=true
+      - PROJECTID=lecoindesentrepreneurs
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - GOOGLE_SERVICES_API_KEY=${GOOGLE_SERVICES_API_KEY}
+      - GOOGLE_SERVICE_ACCOUNT=${GOOGLE_SERVICE_ACCOUNT}
+      - OTP_SECRET=dummySECRETdummy
+      - TOKEN_SECRET_SALT=ada5afe9d4786a0a9b0bb7f53e2a6ffaac170cc7c6cea5daf32adf8a8585e98a
+      - Aidesentreprises_Key=${Aidesentreprises_Key}
+      - X_Aidesentreprises_Id=${X_Aidesentreprises_Id}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - COTISATION_SVC=${COTISATION_SVC}
+      - DB_INQUIST=${DB_INQUIST}
+      - DB_BUSINESS_TEST_SUITES=${DB_BUSINESS_TEST_SUITES}
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+      - SYS_PTRACE
+    tty: true
+    stdin_open: true
+    ports:
+      - 8080:8080
+      - 2345:2345   ## THIS PORT IS THE DEBUGGER PORT THAT NEED TO BE EXPOSED.
+    restart: on-failure
+    depends_on:
+      - mongo
+      - db
+      - kafka0
+      - kafka1
+      - kafka2
+      - redis
+    volumes:
+      - ./backend-app:/src
+      - ./backend-app:/src:rw,delegated
+    # networks:
+    #   - bcp
+    # links:
+    #   - cotisation-app:cotisation-app
+  
+  redis:
+    image: "redis:alpine"
+    ports:
+     - "6379:6379"
+    volumes:
+     - redis-data:/var/lib/redis
+    # networks:
+    #  - bcp
+
+  mongo:
+    image: 'mongo:latest'
+    container_name: 'mongodb'
+    ports:
+      - '27100:27017'
+    volumes:
+      - "mongodata:/data/db"
+
+  db:
+    build: ./db
+    container_name: app-db-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=localhost
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # networks:
+    #   - bcp
+
+  coturn:
+    image: coturn/coturn
+    ports:
+## STUN/TURN
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "3479:3479"
+      - "3479:3479/udp"
+      - "80:80"
+      - "80:80/udp"
+## STUN/TURN SSL
+      - "5349:5349"
+      - "5349:5349/udp"
+      - "5350:5350"
+      - "5350:5350/udp"
+      - "443:443"
+      - "443:443/udp"
+# Relay Ports
+      - '49100-49150:49100-49150'
+      - '49100-49150:49100-49150/udp'
+    volumes:
+      - ./coturn/turnserver.conf:/etc/turnserver.conf:ro
+    
+volumes:
+  redis-data:
+  postgres-data:
+  mongodata:
+

@@ -1,0 +1,17 @@
+EOF
+docker run -d -p 3478:3478 -p 3478:3478/udp -p 5349:5349 -p 5349:5349/udp -p 49160-49200:49160-49200/udp coturn/coturn \
+          --log-file=stdout \
+          --min-port=49160 --max-port=49200 \
+          --lt-cred-mech --fingerprint \
+          --no-multicast-peers --no-cli \
+          --no-tlsv1 --no-tlsv1_1 --no-tlsv1_2 \
+          --user=guidhub:coturn \
+          --realm=guidhub.community \
+          --allow-loopback-peers \
+          --verbose
+
+turn:127.0.0.1:3478?transport=udp Username: guidhub Credential: coturn
+<<\n
+EOF
+done
+%
