@@ -3,7 +3,7 @@ variables:
   IMAGE_NAME: bcp
   CLUSTER_ZONE: europe-west1-b
   CLUSTER_NAME: lecoindesentrepreneurs-bcp-production
-  GOOGLE_CLOUD_IMAGE: gcr.io/lecoindesentrepreneurs/bcp-production-deployment:latest 
+  GOOGLE_CLOUD_IMAGE: gcr.io/lecoindesentrepreneurs/bcp-production-deployment:latest
   GCR_HOST: eu.gcr.io
 
 services:
@@ -29,8 +29,8 @@ deploy-image:
     - _init_
     - gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE --project $GCP_PROJECT_ID
     - git config --global user.name "user name"
-    - git config --global user.email "email address"
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/{"email address"}/lecoindesentrepreneurs-bcp-chats.git
+    - git config --global user.email "email address""
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/{user name}/lecoindesentrepreneurs-bcp-chats.git
     - echo "deploying image:" ${GCR_HOST}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CI_COMMIT_SHA}
     - helm upgrade
       --reuse-values
@@ -43,14 +43,13 @@ deploy-image:
     - master
 
 .functions: &functions |
-    # Functions
-    function _init_() {
-        mkdir -p /etc/deploy
-        echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
-        gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
-        gcloud config set project $GCP_PROJECT_ID
-    }
+  # Functions
+  function _init_() {
+      mkdir -p /etc/deploy
+      echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+      gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+      gcloud config set project $GCP_PROJECT_ID
+  }
 
 before_script:
-- *functions
-
+  - *functions

@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=eu.gcr.io/$PROJECT_ID/bcp-client:${COMMIT_SHA}'
+      - '--file=./Dockerfile.prod'
+      - .
+images:
+  - 'eu.gcr.io/$PROJECT_ID/bcp-client:${COMMIT_SHA}'
+timeout: 1500s
+logsBucket: 'gs://lecoindesentrepreneurs-bcp-gitlab-gke-cloudbuild-logs/'
+options:
+  machineType: 'E2_HIGHCPU_32'

@@ -1,0 +1,12 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "eu.gcr.io/$PROJECT_ID/bcp-employee-cotisation:${COMMIT_SHA}",
+        ".",
+      ]
+images:
+  - "eu.gcr.io/$PROJECT_ID/bcp-employee-cotisation:${COMMIT_SHA}"
+logsBucket: "gs://lecoindesentrepreneurs-bcp-gitlab-gke-cloudbuild-logs/"

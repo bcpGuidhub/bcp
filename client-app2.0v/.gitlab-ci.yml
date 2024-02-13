@@ -1,0 +1,78 @@
+variables:
+  GCP_PROJECT_ID: lecoindesentrepreneurs
+  IMAGE_NAME: bcp-client
+  CLUSTER_ZONE: europe-west1-b
+  CLUSTER_NAME: lecoindesentrepreneurs-bcp-production
+  CLUSTER_ZONE_STAGING: europe-west3-b
+  CLUSTER_NAME_STAGING: lecoindesentrepreneurs-bcp
+  GOOGLE_CLOUD_IMAGE: gcr.io/lecoindesentrepreneurs/bcp-production-deployment:latest
+  GOOGLE_CLOUD_IMAGE_STAGING: gcr.io/lecoindesentrepreneurs/bcp-production-deployment:latest
+  GCR_HOST: eu.gcr.io
+
+services:
+  - docker:dind
+
+stages:
+  - publish
+  - deploy
+
+publish-image:
+  stage: publish
+  image: $GOOGLE_CLOUD_IMAGE
+  script:
+    - _init_
+    - gcloud builds submit . --config=cloudbuild.yaml --substitutions COMMIT_SHA=$CI_COMMIT_SHA
+  only:
+    - master
+
+# publish-staging-image:
+#   stage: publish
+#   image: $GOOGLE_CLOUD_IMAGE_STAGING
+#   script:
+#     - _init_
+#     - gcloud builds submit . --config=cloudbuild.yaml --substitutions COMMIT_SHA=$CI_COMMIT_SHA
+#   except:
+#     - master
+
+deploy-image:
+  stage: deploy
+  image: $GOOGLE_CLOUD_IMAGE
+  script:
+    - _init_
+    - gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE --project $GCP_PROJECT_ID
+    - git config --global user.name "user name"
+    - git config --global user.email "email address"
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/{email address}/lecoindesentrepreneurs-bcp-chats.git
+    - echo "deploying image:" ${GCR_HOST}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CI_COMMIT_SHA}
+    - helm upgrade
+      --reuse-values
+      --set image.repository.frontend="${GCR_HOST}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CI_COMMIT_SHA}"
+      --wait
+      --namespace production
+      lecoindesentrepreneurs-bcp-production
+      ./lecoindesentrepreneurs-bcp-chats
+  only:
+    - master
+
+# deploy-staging-image:
+#   stage: deploy
+#   image: $GOOGLE_CLOUD_IMAGE
+#   script:
+#     - _init_
+#     - gcloud container clusters get-credentials $CLUSTER_NAME_STAGING --zone $CLUSTER_ZONE_STAGING --project $GCP_PROJECT_ID
+#     - echo "deploying image:" ${GCR_HOST}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CI_COMMIT_SHA} " to staging... "
+#     - kubectl set image deployment/bcp-frontend-staging "${GCR_HOST}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${CI_COMMIT_SHA}"
+#   except:
+#     - master
+
+.functions: &functions |
+  # Functions
+  function _init_() {
+      mkdir -p /etc/deploy
+      echo $GCLOUD_SERVICE_KEY | base64 -d > ${HOME}/gcloud-service-key.json
+      gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+      gcloud config set project $GCP_PROJECT_ID
+  }
+
+before_script:
+  - *functions
