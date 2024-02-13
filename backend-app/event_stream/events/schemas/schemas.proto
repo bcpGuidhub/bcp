@@ -1,0 +1,112 @@
+syntax = "proto3";
+package events;
+
+option go_package = "gitlab.com/le-coin-des-entrepreneurs/backend-app/event_stream/events/schemas";
+import "google/protobuf/timestamp.proto" ; 
+import "event_stream/commands/schemas/schemas.proto";
+
+message PostAdded {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  repeated commands.PostTag PostTag = 3;
+  google.protobuf.Timestamp post_date = 4;
+}
+
+message PostAnswerAdded {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  string answer_id = 3;
+  google.protobuf.Timestamp post_date = 4;
+}
+
+message PostRevisionAdded {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  google.protobuf.Timestamp post_date = 3;
+}
+
+message AnswerRevisionAdded {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  string answer_id = 3;
+  google.protobuf.Timestamp updated = 4;
+}
+
+message PostUpVoted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID post_id = 7;
+}
+
+message RetractedPostUpVoted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID post_id = 7;
+}
+
+message PostDownVoted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID post_id = 7;
+}
+
+message RetractedPostDownVoted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID post_id = 6;
+}
+
+message AnswerUpVoted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID answer_id = 7;
+}
+
+message AnswerDownVoted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID answer_id = 7;
+}
+
+message AnswerAccepted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID answer_id = 7;
+}
+
+message RetractedAnswerAccepted {
+  commands.UUID id = 1;
+  commands.UUID aggregate_id = 2;
+  commands.UUID voter_id = 3;
+  google.protobuf.Timestamp cast = 4;
+  int64 weight = 5;
+  commands.UUID vote_id = 6;
+  commands.UUID answer_id = 7;
+}

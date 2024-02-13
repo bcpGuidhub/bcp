@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS project_revenues(
+  project_revenues_id uuid DEFAULT uuid_generate_v4(),
+  project_id uuid NOT NULL,
+  revenue_label TEXT NOT NULL,
+  revenue_partition TEXT NOT NULL,
+  annual_amount_tax_excluded_year_1 TEXT NOT NULL,
+  annual_amount_tax_excluded_year_2 TEXT NOT NULL,
+  annual_amount_tax_excluded_year_3 TEXT NOT NULL,
+  inventory_linked_revenue TEXT NOT NULL,
+  percentage_margin TEXT,
+  valuation_of_starting_stock TEXT,
+  mean_valuation_of_stock TEXT,
+  vat_rate_revenue TEXT NOT NULL,
+  customer_payment_deadline TEXT NOT NULL,
+  supplier_payment_deadline TEXT,
+  vat_rate_on_purchases TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  PRIMARY KEY (project_revenues_id),
+  FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+);

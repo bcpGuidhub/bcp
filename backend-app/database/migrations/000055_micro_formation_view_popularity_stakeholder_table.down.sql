@@ -1,0 +1,3 @@
+ALTER TABLE micro_formation_view_popularity_stakeholder 
+DROP CONSTRAINT IF EXISTS unique_micro_formation_view_popularity_stakeholder;
+DROP TABLE IF EXISTS micro_formation_view_popularity_stakeholder;

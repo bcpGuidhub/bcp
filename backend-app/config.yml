@@ -1,0 +1,36 @@
+env:
+  dev:
+    port: 8080
+    host: "localhost"
+    client: "http://localhost:3001"
+    clients:
+      - "http://localhost:3001"
+      - "http://192.168.1.63:3001"
+    password_callback: "http://localhost:3001/reinitialiser/mot-de-passe?reset_password_token="
+    advisor_password_callback: "http://localhost:3001/stakeholder/reinitialiser/mot-de-passe?reset_password_token="
+    advisor_email_activation_callback: "http://localhost:3001/advisor/confirm_email?activation_token="
+    redis: "redis:6379"
+    user_invite_link: "http://localhost:3001/invitee/auth?activation_t="
+  staging:
+    port: 8080
+    host: "localhost"
+    client: "https://stagingfront.bcp.guidhub.fr"
+    clients:
+      - "https://stagingfront.bcp.guidhub.fr"
+    password_callback: "https://stagingfront.bcp.guidhub.fr/reinitialiser/mot-de-passe?reset_password_token="
+    advisor_password_callback: "https://stagingfront.bcp.guidhub.fr/stakeholder/reinitialiser/mot-de-passe?reset_password_token="
+    advisor_email_activation_callback: "https://stagingfront.bcp.guidhub.fr/advisor/confirm_email?activation_token="
+    redis: "redis.staging.svc.cluster.local:6379"
+    user_invite_link: "http://localhost:3001/invitee/auth?activation_t="
+  production:
+    port: 8080
+    host: "localhost"
+    client: "https://bcp.guidhub.fr"
+    clients:
+      - "https://bcp.guidhub.fr"
+      - "https://www.bcp.guidhub.fr"
+    password_callback: "https://bcp.guidhub.fr/reinitialiser/mot-de-passe?reset_password_token="
+    advisor_password_callback: "https://bcp.guidhub.fr/stakeholder/reinitialiser/mot-de-passe?reset_password_token="
+    advisor_email_activation_callback: "https://bcp.guidhub.fr/advisor/confirm_email?activation_token="
+    redis: "redis.production.svc.cluster.local:6379"
+    user_invite_link: "https://bcp.guidhub.fr/invitee/auth?activation_t="

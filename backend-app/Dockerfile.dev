@@ -1,0 +1,75 @@
+FROM golang:1.20-alpine AS base 
+WORKDIR /src
+
+ENV GO111MODULE="on"
+ENV GOOS="linux"
+ENV CGO_ENABLED=0
+
+# System dependencies
+RUN apk update \
+    && apk add --no-cache \
+    ca-certificates \
+    build-base \
+    git \
+    mercurial \
+    gcc \
+    && update-ca-certificates
+
+## Development with hot reload and debugger
+FROM base AS dev
+WORKDIR /src
+
+COPY . /src
+
+ENV GOOGLE_APPLICATION_CREDENTIALS="/src/lecoindesentrepreneurs-ff393423aa2f.json"
+
+RUN go mod download \
+    && go mod verify
+
+# Hot reloading mod
+RUN go install github.com/cosmtrek/air@latest \ 
+    && go install github.com/go-delve/delve/cmd/dlv@latest
+
+EXPOSE 8080
+EXPOSE 2345
+
+ENTRYPOINT ["air"]
+
+# ### Executable build-env
+# FROM base AS build-env
+# WORKDIR /src
+
+# # Application dependencies
+# COPY . /src
+# RUN go mod download \
+#     && go mod verify
+
+# RUN ./build.sh
+
+# FROM alpine:latest
+
+# RUN apk update \
+#     && apk add --no-cache \
+#     ca-certificates \
+#     curl \
+#     tzdata \
+#     && update-ca-certificates
+
+
+# WORKDIR /server
+
+# # Import from builder.
+# COPY --from=build-env /src/beta_agencies_geo_locations.json /server/
+# COPY --from=build-env /src/beta_micro_formation.json /server/
+# COPY --from=build-env /src/config.yml /server/
+# COPY --from=build-env /src/database/migrations /server/database/migrations
+# COPY --from=build-env /src/messages/email_templates /server/messages/email_templates
+# COPY --from=build-env /src/lecoindesentrepreneurs-ff393423aa2f.json /server/
+# COPY --from=build-env /src/key.pem /etc/gcp/
+# ENV SIGNED_URL_PEM_KEY="/etc/gcp/key.pem"
+# ENV GOOGLE_APPLICATION_CREDENTIALS="/server/lecoindesentrepreneurs-ff393423aa2f.json"
+# # Copy our static executable  
+# COPY --from=build-env /src/bin/app /server/
+
+# EXPOSE 8080
+# ENTRYPOINT ["./app"]

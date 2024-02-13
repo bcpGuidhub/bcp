@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE users DROP COLUMN status;
+DROP TYPE enum_status;
+
+COMMIT;

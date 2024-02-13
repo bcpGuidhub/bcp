@@ -1,0 +1,222 @@
+syntax = "proto3";
+package commands;
+
+option go_package = "gitlab.com/le-coin-des-entrepreneurs/backend-app/event_stream/commands/schemas";
+import "google/protobuf/timestamp.proto";
+
+enum PostStatus {
+	ACTIVE = 0;
+	BOUNTIED = 1;
+	CLOSED = 2;
+	FLAGED = 3;
+	ARCHIVED = 4;
+	ANSWERED = 5;
+}
+
+message AddPost { 
+  google.protobuf.Timestamp post_date = 1;
+  UUID id = 2;
+  UUID aggregate_id = 3;
+  string title = 4;
+  string description = 5;
+  PostStatus status = 6;
+  repeated PostTag PostTag = 7;
+  string user_id = 8;
+}
+
+message UUID {
+  string value = 1;
+}
+
+message PostTag {
+  string field = 1;
+}
+
+message Tag {
+  string label = 1;
+  int64 score = 2;
+  string description = 3;
+}
+
+message PostAnswer {
+  google.protobuf.Timestamp post_date = 1;
+  string body = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+}
+
+message AddRevisionToPost {
+  google.protobuf.Timestamp post_date = 1;
+  string title = 2;
+  string description = 3; 
+  string edit_summary = 4;
+  UUID aggregate_id = 5;
+  string author =  6;
+  repeated PostTag PostTag = 7;
+  UUID id = 8;
+}
+
+message AddRevisionToAnswer {
+  google.protobuf.Timestamp post_date = 1;
+  string body = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+  string edit_summary = 6;
+  string answer_id = 7;
+}
+
+message CommentOnPost {
+  google.protobuf.Timestamp post_date = 1;
+  string body = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+  string reply = 6;
+}
+
+message CommentOnAnswer {
+  google.protobuf.Timestamp post_date = 1;
+  string body = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+  string reply = 6;
+}
+
+message FlagComment {
+  google.protobuf.Timestamp post_date = 1;
+  string reason = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+  string details = 6;
+}
+
+message FlagAnswer {
+  google.protobuf.Timestamp post_date = 1;
+  string reason = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+  string details = 6;
+}
+
+message FlagPost {
+  google.protobuf.Timestamp post_date = 1;
+  string reason = 2;
+  string author = 3; 
+  UUID id = 4;
+  UUID aggregate_id = 5;
+  string details = 6;
+}
+
+message RetractFlagPost {
+  google.protobuf.Timestamp post_date = 1;
+  UUID id = 2;
+  string author = 3;
+  UUID aggregate_id = 4;
+}
+
+message RetractFlagAnswer {
+  google.protobuf.Timestamp post_date = 1;
+  UUID id = 2;
+  string author = 3;
+  UUID aggregate_id = 4;
+}
+
+message RetractFlagComment {
+  google.protobuf.Timestamp post_date = 1;
+  UUID id = 2;
+  string author = 3;
+  UUID aggregate_id = 4;
+}
+
+message VoteUpPost {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+}
+
+message RetractVoteUpPost {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+}
+
+message VoteDownPost {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+}
+
+message RetractVoteDownPost {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+}
+
+message VoteUpAnswer {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID answer_id = 5;
+}
+
+message RetractVoteUpAnswer {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID answer_id = 5;
+}
+
+message VoteDownAnswer {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID answer_id = 5;
+}
+
+message RetractVoteDownAnswer {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID answer_id = 5;
+}
+
+message VoteUpComment {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+  UUID comment_id = 5;
+}
+
+message RetractVoteUpComment {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+  UUID comment_id = 5;
+}
+
+message AcceptAnswer {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+  UUID answer_id = 5;
+}
+
+message RetractAcceptAnswer {
+  google.protobuf.Timestamp cast = 1;
+  string voter_id = 2; 
+  UUID id = 3;
+  UUID aggregate_id = 4;
+  UUID answer_id = 5;
+}

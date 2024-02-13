@@ -1,0 +1,4 @@
+ALTER TABLE project_legal_status DROP COLUMN micro_entreprise_accre_exemption TEXT;
+ALTER TABLE project_legal_status DROP COLUMN micro_entreprise_declare_pay_cotisations TEXT;
+ALTER TABLE project_legal_status DROP COLUMN micro_entreprise_activity_category TEXT;
+

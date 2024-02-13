@@ -1,0 +1,12 @@
+env:
+  dev:
+    host: "localhost"
+    port: 3000
+    database:
+      host: "localhost"
+      user: "postgres"
+      password: "postgres"
+      name: "bcp"
+      port: 5433
+    secret_key: ada5afe9d4786a0a9b0bb7f53e2a6ffaac170cc7c6cea5daf32adf8a8585e98a
+    client: "http://localhost:3001"

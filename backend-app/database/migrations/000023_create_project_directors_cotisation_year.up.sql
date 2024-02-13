@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS project_directors_cotisation_year(
+  project_directors_cotisation_year_id uuid DEFAULT uuid_generate_v4(),
+  project_directors_id uuid NOT NULL,
+  year TEXT NOT NULL,
+  month_1_cotisation TEXT NOT NULL,
+  month_2_cotisation TEXT NOT NULL,
+  month_3_cotisation TEXT NOT NULL,
+  month_4_cotisation TEXT NOT NULL,
+  month_5_cotisation TEXT NOT NULL,
+  month_6_cotisation TEXT NOT NULL,
+  month_7_cotisation TEXT NOT NULL,
+  month_8_cotisation TEXT NOT NULL,
+  month_9_cotisation TEXT NOT NULL,
+  month_10_cotisation TEXT NOT NULL,
+  month_11_cotisation TEXT NOT NULL,
+  month_12_cotisation TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP,
+  updated_at TIMESTAMP,
+  PRIMARY KEY (project_directors_cotisation_year_id),
+  FOREIGN KEY (project_directors_id) REFERENCES project_directors(project_directors_id) ON DELETE CASCADE
+);

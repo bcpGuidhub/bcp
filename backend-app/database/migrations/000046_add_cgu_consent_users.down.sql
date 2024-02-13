@@ -1,0 +1,3 @@
+ALTER TABLE users 
+DROP COLUMN cgu_consent BOOLEAN;
+
