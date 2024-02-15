@@ -19,7 +19,7 @@
 
 # Go workspace file
 go.work
-/.env
+.env
 
 backend-app/lecoindesentrepreneurs-ff393423aa2f.json.json
 backend-app/beta_micro_formation.json
